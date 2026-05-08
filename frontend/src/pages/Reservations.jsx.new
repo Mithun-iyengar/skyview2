@@ -1,0 +1,258 @@
+import React, { useEffect, useState } from 'react'
+import { bookingApi, getCurrentUserId } from '../utils/bookingApi'
+
+export default function Reservations() {
+  const [bookings, setBookings] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [successBanner, setSuccessBanner] = useState('')
+  const [userId, setUserId] = useState(null)
+
+  useEffect(() => {
+    const message = sessionStorage.getItem('skyline_booking_success')
+    if (message) {
+      setSuccessBanner(message)
+      sessionStorage.removeItem('skyline_booking_success')
+    }
+  }, [])
+
+  useEffect(() => {
+    async function fetchBookings() {
+      const currentUserId = getCurrentUserId()
+      setUserId(currentUserId)
+      if (!currentUserId) {
+        setError('Please sign in to view your bookings.')
+        setLoading(false)
+        return
+      }
+
+      setLoading(true)
+      setError(null)
+      try {
+        const data = await bookingApi.getUserBookings(currentUserId)
+        const normalized = Array.isArray(data) ? data : []
+        normalized.sort((a, b) => {
+          const left = new Date(a?.createdAt || 0).getTime()
+          const right = new Date(b?.createdAt || 0).getTime()
+          return right - left
+        })
+        setBookings(normalized)
+      } catch (err) {
+        setError(err.message || 'Failed to load bookings')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchBookings()
+  }, [])
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#0a0f1f] via-[#0f1a35] to-[#1a0f2e] relative overflow-hidden">
+      {/* Subtle Background Elements */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-20 right-10 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-10 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-6xl">
+          
+          {/* Page Header */}
+          <div className="mb-12">
+            <h1 className="text-5xl md:text-6xl font-black text-white mb-2 tracking-tight">
+              My Reservations
+            </h1>
+            <p className="text-gray-400 text-lg font-light">
+              Manage your premium flight bookings with Skyline Airways
+            </p>
+            <div className="w-20 h-1 bg-gradient-to-r from-[#D4AF37] to-transparent mt-6" />
+          </div>
+
+          {/* Success Message */}
+          {successBanner && (
+            <div className="mb-8 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl backdrop-blur-md">
+              <p className="text-emerald-300 font-semibold flex items-center gap-2">
+                <span className="text-lg">✓</span>
+                {successBanner}
+              </p>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-8 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl backdrop-blur-md">
+              <p className="text-rose-300 font-semibold flex items-center gap-2">
+                <span className="text-lg">⚠</span>
+                {error}
+              </p>
+            </div>
+          )}
+
+          {/* Loading State */}
+          {loading && (
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="w-12 h-12 rounded-full border-4 border-gray-700 border-t-[#D4AF37] animate-spin mb-4" />
+              <p className="text-gray-300 font-light">Loading your reservations...</p>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && !error && bookings.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-gray-400 text-lg mb-6">
+                {userId ? 'No active bookings' : 'Please sign in to view your bookings'}
+              </p>
+              <a href="/flights" className="inline-block px-8 py-3 bg-[#D4AF37] text-[#0a0f1f] font-bold rounded-lg hover:bg-[#e5c158] transition-colors">
+                Book a Flight
+              </a>
+            </div>
+          )}
+
+          {/* Bookings List */}
+          {!loading && bookings.length > 0 && (
+            <div className="space-y-8">
+              {bookings.map((b) => (
+                <div
+                  key={b.id}
+                  className="group bg-gradient-to-br from-[#1a2847] to-[#0f1a35] rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl hover:shadow-3xl hover:border-white/20 transition-all duration-300 overflow-hidden hover:scale-[1.01]"
+                >
+                  {/* Card Header - Booking Reference & Status */}
+                  <div className="px-8 py-6 border-b border-white/10 flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-1">Booking Reference</p>
+                      <h3 className="text-3xl font-black text-white">#{b.id}</h3>
+                    </div>
+                    <div className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide ${
+                      b.status?.toLowerCase() === 'confirmed'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        : b.status?.toLowerCase() === 'pending'
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                    }`}>
+                      {b.status || 'Unknown'}
+                    </div>
+                  </div>
+
+                  {/* Card Content */}
+                  <div className="px-8 py-8">
+                    {/* Flight Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                      {/* Flight Info */}
+                      <div>
+                        <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-3">Flight</p>
+                        {b.flightId ? (
+                          <a
+                            href={`/flight/${b.flightId}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-white text-2xl font-bold hover:text-[#D4AF37] transition-colors"
+                          >
+                            SkyFlight {b.flightId}
+                          </a>
+                        ) : (
+                          <p className="text-gray-500">—</p>
+                        )}
+                      </div>
+
+                      {/* Booking Date */}
+                      <div>
+                        <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-3">Booked On</p>
+                        <p className="text-white font-semibold">
+                          {b.createdAt
+                            ? new Date(b.createdAt).toLocaleDateString('en-IN', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              })
+                            : '—'}
+                        </p>
+                      </div>
+
+                      {/* Seats */}
+                      <div>
+                        <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-3">Seats</p>
+                        <div className="flex flex-wrap gap-2">
+                          {Array.isArray(b.seatNumbers) && b.seatNumbers.length > 0 ? (
+                            b.seatNumbers.map((seat, idx) => (
+                              <span
+                                key={idx}
+                                className="px-3 py-1 bg-white/10 text-white font-semibold text-sm rounded-lg border border-white/20"
+                              >
+                                {seat}
+                              </span>
+                            ))
+                          ) : (
+                            <p className="text-gray-500">—</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="border-t border-white/10 my-8" />
+
+                    {/* Primary Passenger */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                      <div>
+                        <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-3">
+                          Primary Passenger
+                        </p>
+                        {b.passengerName ? (
+                          <div>
+                            <p className="text-white text-xl font-bold mb-2">{b.passengerName}</p>
+                            <div className="text-gray-400 text-sm space-y-1">
+                              <p>📧 {b.passengerEmail || '—'}</p>
+                              <p>📱 {b.passengerPhone || '—'}</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-gray-500">—</p>
+                        )}
+                      </div>
+
+                      {/* Total Amount */}
+                      <div className="flex items-end">
+                        <div>
+                          <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-3">Total Amount</p>
+                          <p className="text-5xl font-black text-[#D4AF37]">
+                            {b.totalAmount != null ? `₹${Number(b.totalAmount).toLocaleString('en-IN')}` : '—'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Additional Passengers */}
+                    {Array.isArray(b.additionalPassengers) && b.additionalPassengers.length > 0 && (
+                      <div>
+                        <div className="border-t border-white/10 my-8" />
+                        <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold mb-4">
+                          Additional Passengers
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {b.additionalPassengers.map((p, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-white/5 border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-colors"
+                            >
+                              <p className="text-white font-semibold mb-2">{p.fullName || p.name || 'Unnamed'}</p>
+                              <div className="text-gray-400 text-sm space-y-1">
+                                <p>Age: {p.age || '—'}</p>
+                                <p className="capitalize">Meal: {p.mealPreference || '—'}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

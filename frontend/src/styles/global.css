@@ -1,0 +1,895 @@
+/* --------------------------------------------------------------------------
+   Skyline Airways - Global foundation styles
+   Shared across all pages for a premium enterprise travel experience.
+---------------------------------------------------------------------------- */
+
+:root{
+  --sky-navy: #08162f;
+  --sky-navy-2: #102a6b;
+  --sky-blue: #1f4da0;
+  --royal-gold: #d4af37;
+  --ivory: #fbf8f3;
+  --mist: #eef3fb;
+  --text: #14213d;
+  --muted: #6a7280;
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-strong: rgba(255, 255, 255, 0.9);
+  --border: rgba(255, 255, 255, 0.16);
+  --shadow-soft: 0 18px 40px rgba(8, 22, 47, 0.12);
+  --shadow-strong: 0 28px 70px rgba(8, 22, 47, 0.2);
+  --glow-gold: 0 0 0 4px rgba(212, 175, 55, 0.12), 0 14px 28px rgba(212, 175, 55, 0.22);
+  --page-gradient: linear-gradient(160deg, #08162f 0%, #12306e 38%, #214a9a 100%);
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  margin:0;
+  color:var(--text);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(212,175,55,0.12), transparent 28%),
+    radial-gradient(circle at 90% 10%, rgba(255,255,255,0.18), transparent 24%),
+    linear-gradient(180deg, #f5f8fe 0%, #eef3fb 100%);
+  min-height:100vh;
+}
+
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background: linear-gradient(160deg, rgba(8,22,47,0.04), transparent 42%);
+  z-index:-1;
+}
+
+a{
+  color:inherit;
+  transition: color .2s ease, opacity .2s ease, transform .2s ease;
+}
+
+a:hover{opacity:.95}
+
+.container{max-width:1180px;margin:0 auto;padding:1rem}
+
+.app-shell{min-height:100vh}
+
+.content{
+  min-height: calc(100vh - 170px);
+  padding: 2rem 0 3rem;
+}
+
+/* Premium header / footer foundation */
+.site-header{
+  position: relative;
+  z-index: 5000;
+  background: linear-gradient(90deg, rgba(8,22,47,0.96), rgba(16,42,107,0.95));
+  color:white;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 10px 30px rgba(8, 22, 47, 0.18);
+  backdrop-filter: blur(8px);
+}
+
+.header-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+}
+
+.brand{
+  font-weight:800;
+  font-size:1.35rem;
+  color:var(--royal-gold);
+  text-decoration:none;
+  letter-spacing:.02em;
+}
+
+.nav{
+  display:flex;
+  align-items:center;
+  gap:.25rem;
+  flex-wrap:wrap;
+}
+
+.nav a,
+.nav-link{
+  color:rgba(255,255,255,0.92);
+  text-decoration:none;
+  padding:.55rem .85rem;
+  border-radius:999px;
+  transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+.nav a:hover,
+.nav-link:hover{
+  background:rgba(255,255,255,0.08);
+  transform:translateY(-1px);
+}
+
+.user-info{
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255,255,255,0.92);
+  padding: .55rem .85rem;
+}
+
+.user-avatar{
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--royal-gold);
+  color: var(--sky-navy-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.btn-logout{
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.92);
+  text-decoration: none;
+  padding: .55rem .85rem;
+  border-radius: 999px;
+  transition: background .2s ease;
+  cursor: pointer;
+}
+
+.btn-logout:hover{
+  background: rgba(255,255,255,0.08);
+}
+
+.user-menu{
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.user-info{
+  cursor: default;
+}
+
+.user-caret{
+  font-size: .75rem;
+  opacity: .85;
+}
+
+.wallet-popover{
+  position: absolute;
+  top: calc(100% + .65rem);
+  right: 0;
+  min-width: 220px;
+  padding: .95rem 1rem;
+  border-radius: 16px;
+  background: rgba(8, 22, 47, 0.98);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 20px 40px rgba(8,22,47,0.35);
+  z-index: 6000;
+}
+
+.wallet-popover::before{
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 22px;
+  width: 12px;
+  height: 12px;
+  background: rgba(8, 22, 47, 0.98);
+  border-left: 1px solid rgba(255,255,255,0.12);
+  border-top: 1px solid rgba(255,255,255,0.12);
+  transform: rotate(45deg);
+}
+
+.wallet-popover-label{
+  color: rgba(255,255,255,0.72);
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: .35rem;
+}
+
+.wallet-popover-balance{
+  color: var(--royal-gold);
+  font-weight: 800;
+  font-size: 1.2rem;
+  margin-bottom: .2rem;
+}
+
+.wallet-popover-subtext{
+  color: rgba(255,255,255,0.72);
+  font-size: .82rem;
+  line-height: 1.35;
+}
+
+.wallet-popover-action{
+  margin-top: .85rem;
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: .6rem .85rem;
+  background: var(--royal-gold);
+  color: var(--sky-navy-2);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.wallet-popover-action:hover{
+  filter: brightness(1.03);
+}
+
+.wallet-popover-input{
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: white;
+  border-radius: 10px;
+  padding: .65rem .8rem;
+  outline: none;
+  margin-top: .75rem;
+}
+
+.wallet-popover-input::placeholder{
+  color: rgba(255,255,255,0.45);
+}
+
+.wallet-popover-error{
+  margin-top: .5rem;
+  color: #ffb7b7;
+  font-size: .82rem;
+}
+
+.wallet-popover-actions{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .5rem;
+  margin-top: .85rem;
+}
+
+.wallet-popover-action-secondary{
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.wallet-popover-action:disabled{
+  opacity: .7;
+  cursor: not-allowed;
+}
+
+.toast-message{
+  position: fixed;
+  top: 1.1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1200;
+  min-width: min(360px, calc(100vw - 2rem));
+  max-width: min(460px, calc(100vw - 2rem));
+  border-radius: 16px;
+  padding: .95rem 1.15rem;
+  box-shadow: 0 14px 34px rgba(8,22,47,0.24);
+  font-size: .96rem;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  animation: fadeInUp .35s ease both;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.toast-message.success{
+  background: rgba(17, 122, 116, 0.14);
+  border: 1px solid rgba(17, 122, 116, 0.3);
+  color: #0f5a55;
+}
+
+.toast-message.error{
+  background: rgba(185, 28, 28, 0.12);
+  border: 1px solid rgba(185, 28, 28, 0.28);
+  color: #8b1d1d;
+}
+
+.toast-message.info{
+  background: rgba(31, 77, 160, 0.12);
+  border: 1px solid rgba(31, 77, 160, 0.28);
+  color: #12306e;
+}
+
+.toast-message::before{
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.site-footer{
+  border-top:1px solid rgba(8,22,47,0.08);
+  padding:1.2rem 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(255,255,255,0.92));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -8px 30px rgba(8, 22, 47, 0.05);
+}
+
+.site-footer strong{
+  color:var(--sky-navy-2);
+}
+
+.page{
+  animation: pageFadeIn .42s ease both;
+}
+
+.page h1{margin-top:0}
+
+/* Buttons inherit the royal palette */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;
+  background: linear-gradient(90deg, var(--sky-navy-2), var(--sky-blue));
+  color:white;
+  padding:.75rem 1.1rem;
+  border-radius:12px;
+  text-decoration:none;
+  border:none;
+  box-shadow: 0 10px 24px rgba(16, 42, 107, 0.18);
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+.btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(16, 42, 107, 0.22), 0 0 0 4px rgba(212, 175, 55, 0.08);
+  filter: brightness(1.03);
+}
+
+.btn:focus-visible{
+  outline:none;
+  box-shadow: var(--glow-gold);
+}
+
+/* Utility surfaces for glassmorphism */
+.glass-surface{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(14px) saturate(120%);
+}
+
+@keyframes pageFadeIn{
+  from{opacity:0; transform: translateY(12px)}
+  to{opacity:1; transform: translateY(0)}
+}
+
+@media (max-width:720px){
+  .content{padding:1.3rem 0 2rem}
+  .header-inner{flex-direction:column;align-items:flex-start}
+  .nav{width:100%}
+  .nav a,.nav-link{padding:.5rem .75rem}
+  .toast-message{
+    top: .8rem;
+    min-width: calc(100vw - 1.2rem);
+    max-width: calc(100vw - 1.2rem);
+    padding: .85rem 1rem;
+    font-size: .92rem;
+  }
+}
+
+/* Flight Details Page */
+.flight-details-card {
+  background: var(--surface-strong);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 2rem;
+}
+
+.flight-header {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.flight-image {
+  width: 300px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.flight-info h1 {
+  margin: 0 0 0.5rem 0;
+  color: var(--sky-navy);
+}
+
+.airline {
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.route {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.times {
+  display: flex;
+  gap: 2rem;
+}
+
+.time-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.time {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--sky-navy);
+}
+
+.date {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.duration {
+  margin-left: auto;
+}
+
+.seat-classes {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.seat-class-card {
+  background: var(--mist);
+  padding: 1rem;
+  border-radius: 8px;
+  flex: 1;
+}
+
+.seat-class-card h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--sky-blue);
+}
+
+.class-details {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Seat Map */
+.seat-map-container {
+  background: var(--surface-strong);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.countdown-timer {
+  background: #fff3cd;
+  color: #856404;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.legend {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.seat {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seat.available {
+  background: #d4edda;
+  color: #155724;
+}
+
+.seat.available:hover {
+  background: #c3e6cb;
+}
+
+.seat.selected {
+  background: var(--royal-gold);
+  color: white;
+}
+
+.seat.occupied {
+  background: #f8d7da;
+  color: #721c24;
+  cursor: not-allowed;
+}
+
+.seat.locked {
+  background: #fff3cd;
+  color: #856404;
+  cursor: not-allowed;
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.row-number {
+  width: 30px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.seat-map {
+  margin-bottom: 1rem;
+}
+
+.class-price {
+  text-align: center;
+  font-weight: 600;
+  color: var(--sky-blue);
+}
+
+.selected-seats-summary {
+  background: var(--mist);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.selected-seats-summary ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.selected-seats-summary li {
+  background: var(--sky-blue);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* Passenger Form */
+.passenger-form-container {
+  background: var(--surface-strong);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.booking-summary {
+  background: var(--mist);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.passenger-form {
+  max-width: 600px;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--sky-navy);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--royal-gold);
+  box-shadow: var(--glow-gold);
+}
+
+.form-group.error input,
+.form-group.error select {
+  border-color: #dc3545;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+/* Payment Section */
+.payment-section {
+  background: var(--surface-strong);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary {
+  background: var(--sky-blue);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--sky-navy-2);
+}
+
+.btn-secondary {
+  background: var(--mist);
+  color: var(--sky-navy);
+}
+
+.btn-secondary:hover {
+  background: #e0e7f5;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.btn-success:hover {
+  background: #218838;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Wallet Section */
+.wallet-section {
+  position: relative;
+  z-index: 5;
+  padding: 2rem 0;
+  margin: 1rem 0;
+}
+
+/* Wallet Card Styles */
+.wallet-card {
+  position: relative;
+  z-index: 1;
+  background: var(--surface-strong);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 2rem;
+  border: 1px solid var(--border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wallet-card:hover {
+  z-index: 50;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-strong);
+}
+
+.wallet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--mist);
+}
+
+.wallet-title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--sky-navy);
+  font-weight: 600;
+}
+
+.wallet-balance {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--mist);
+  border-radius: 10px;
+}
+
+.balance-label {
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.balance-amount {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--sky-blue);
+}
+
+.balance-amount.loading {
+  font-size: 1rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+.add-money-section {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.wallet-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 1rem;
+  background: white;
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wallet-input:focus {
+  outline: none;
+  border-color: var(--sky-blue);
+  box-shadow: 0 0 0 3px rgba(31, 77, 160, 0.1);
+}
+
+.wallet-input:disabled {
+  background: var(--mist);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.wallet-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--sky-blue);
+  color: white;
+  white-space: nowrap;
+}
+
+.wallet-btn:hover:not(:disabled) {
+  background: #1a3d80;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(31, 77, 160, 0.3);
+}
+
+.wallet-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .wallet-card {
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .wallet-title {
+    font-size: 1.1rem;
+  }
+
+  .balance-amount {
+    font-size: 1.5rem;
+  }
+
+  .add-money-section {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .wallet-btn {
+    width: 100%;
+  }
+}
+
+/* Fade in animation */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

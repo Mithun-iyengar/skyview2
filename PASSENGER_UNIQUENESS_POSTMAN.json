@@ -1,0 +1,328 @@
+{
+  "info": {
+    "name": "Passenger Uniqueness Validation Tests",
+    "description": "Comprehensive test suite for passenger uniqueness in flight bookings",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "passenger-uniqueness-tests",
+    "version": 1
+  },
+  "item": [
+    {
+      "name": "Test Case 1 - Valid Booking (Unique Passengers)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201 Created', function() {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Response has booking ID', function() {",
+              "  let jsonData = pm.response.json();",
+              "  pm.expect(jsonData.id).to.exist;",
+              "});",
+              "",
+              "pm.test('Booking status is CONFIRMED', function() {",
+              "  let jsonData = pm.response.json();",
+              "  pm.expect(jsonData.status).to.equal('CONFIRMED');",
+              "});",
+              "",
+              "pm.test('All 3 passengers saved', function() {",
+              "  let jsonData = pm.response.json();",
+              "  pm.expect(jsonData.passengers).to.be.an('array');",
+              "  pm.expect(jsonData.passengers.length).to.equal(3);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{JWT_TOKEN}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"flightId\": 1,\n  \"userId\": 7,\n  \"seatNumbers\": [\"E1A\", \"E1B\", \"E1C\"],\n  \"passengerName\": \"Asha Kumar\",\n  \"passengerEmail\": \"asha.kumar@example.com\",\n  \"passengerPhone\": \"9876543210\",\n  \"passengerAge\": 29,\n  \"aadhaarNumber\": \"123456789012\",\n  \"passportNumber\": \"P1234567\",\n  \"mealPreference\": \"vegetarian\",\n  \"wheelchairAssistance\": false,\n  \"totalAmount\": 12500,\n  \"paymentMethod\": \"WALLET\",\n  \"additionalPassengers\": [\n    {\n      \"fullName\": \"Rajesh Kumar\",\n      \"age\": 31,\n      \"email\": \"rajesh.kumar@example.com\",\n      \"phone\": \"9876543211\",\n      \"aadhaarNumber\": \"210987654321\",\n      \"passportNumber\": \"P7654321\",\n      \"mealPreference\": \"non-vegetarian\"\n    },\n    {\n      \"fullName\": \"Priya Singh\",\n      \"age\": 27,\n      \"email\": \"priya.singh@example.com\",\n      \"phone\": \"9876543212\",\n      \"aadhaarNumber\": \"321098765432\",\n      \"passportNumber\": \"P2468135\",\n      \"mealPreference\": \"vegan\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/api/v1/bookings",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "bookings"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Test Case 2 - Invalid: Duplicate Email",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 409 Conflict', function() {",
+              "  pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test('Error message mentions email', function() {",
+              "  let jsonData = pm.response.json();",
+              "  pm.expect(jsonData.message).to.include('email');",
+              "});",
+              "",
+              "pm.test('Response contains error details', function() {",
+              "  let jsonData = pm.response.json();",
+              "  pm.expect(jsonData.error).to.equal('Conflict');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{JWT_TOKEN}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"flightId\": 1,\n  \"userId\": 7,\n  \"seatNumbers\": [\"E2A\", \"E2B\"],\n  \"passengerName\": \"Asha Kumar\",\n  \"passengerEmail\": \"asha.kumar@example.com\",\n  \"passengerPhone\": \"9876543210\",\n  \"passengerAge\": 29,\n  \"aadhaarNumber\": \"123456789012\",\n  \"passportNumber\": \"P1234567\",\n  \"mealPreference\": \"vegetarian\",\n  \"wheelchairAssistance\": false,\n  \"totalAmount\": 12500,\n  \"paymentMethod\": \"WALLET\",\n  \"additionalPassengers\": [\n    {\n      \"fullName\": \"Rajesh Kumar\",\n      \"age\": 31,\n      \"email\": \"asha.kumar@example.com\",\n      \"phone\": \"9876543211\",\n      \"aadhaarNumber\": \"210987654321\",\n      \"passportNumber\": \"P7654321\",\n      \"mealPreference\": \"non-vegetarian\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/api/v1/bookings",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "bookings"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Test Case 3 - Invalid: Duplicate Aadhaar",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 409 Conflict', function() {",
+              "  pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test('Error message mentions aadhaar', function() {",
+              "  let jsonData = pm.response.json();",
+              "  pm.expect(jsonData.message.toLowerCase()).to.include('aadhaar');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{JWT_TOKEN}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"flightId\": 1,\n  \"userId\": 7,\n  \"seatNumbers\": [\"E3A\", \"E3B\"],\n  \"passengerName\": \"Asha Kumar\",\n  \"passengerEmail\": \"asha.kumar@example.com\",\n  \"passengerPhone\": \"9876543210\",\n  \"passengerAge\": 29,\n  \"aadhaarNumber\": \"123456789012\",\n  \"passportNumber\": \"P1234567\",\n  \"mealPreference\": \"vegetarian\",\n  \"wheelchairAssistance\": false,\n  \"totalAmount\": 12500,\n  \"paymentMethod\": \"WALLET\",\n  \"additionalPassengers\": [\n    {\n      \"fullName\": \"Rajesh Kumar\",\n      \"age\": 31,\n      \"email\": \"rajesh.kumar@example.com\",\n      \"phone\": \"9876543211\",\n      \"aadhaarNumber\": \"123456789012\",\n      \"passportNumber\": \"P7654321\",\n      \"mealPreference\": \"non-vegetarian\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/api/v1/bookings",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "bookings"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Test Case 4 - Invalid: Duplicate Phone",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 409 Conflict', function() {",
+              "  pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test('Error message mentions phone', function() {",
+              "  let jsonData = pm.response.json();",
+              "  pm.expect(jsonData.message.toLowerCase()).to.include('phone');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{JWT_TOKEN}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"flightId\": 1,\n  \"userId\": 7,\n  \"seatNumbers\": [\"E4A\", \"E4B\", \"E4C\"],\n  \"passengerName\": \"Asha Kumar\",\n  \"passengerEmail\": \"asha.kumar@example.com\",\n  \"passengerPhone\": \"9876543210\",\n  \"passengerAge\": 29,\n  \"aadhaarNumber\": \"123456789012\",\n  \"passportNumber\": \"P1234567\",\n  \"mealPreference\": \"vegetarian\",\n  \"wheelchairAssistance\": false,\n  \"totalAmount\": 12500,\n  \"paymentMethod\": \"WALLET\",\n  \"additionalPassengers\": [\n    {\n      \"fullName\": \"Rajesh Kumar\",\n      \"age\": 31,\n      \"email\": \"rajesh.kumar@example.com\",\n      \"phone\": \"9876543210\",\n      \"aadhaarNumber\": \"210987654321\",\n      \"passportNumber\": \"P7654321\",\n      \"mealPreference\": \"non-vegetarian\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/api/v1/bookings",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "bookings"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Test Case 5 - Invalid: Duplicate Passport",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 409 Conflict', function() {",
+              "  pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test('Error message mentions passport', function() {",
+              "  let jsonData = pm.response.json();",
+              "  pm.expect(jsonData.message.toLowerCase()).to.include('passport');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{JWT_TOKEN}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"flightId\": 1,\n  \"userId\": 7,\n  \"seatNumbers\": [\"B1A\", \"B1B\"],\n  \"passengerName\": \"Asha Kumar\",\n  \"passengerEmail\": \"asha.kumar@example.com\",\n  \"passengerPhone\": \"9876543210\",\n  \"passengerAge\": 29,\n  \"aadhaarNumber\": \"123456789012\",\n  \"passportNumber\": \"P1234567\",\n  \"mealPreference\": \"vegetarian\",\n  \"wheelchairAssistance\": false,\n  \"totalAmount\": 15000,\n  \"paymentMethod\": \"WALLET\",\n  \"additionalPassengers\": [\n    {\n      \"fullName\": \"Rajesh Kumar\",\n      \"age\": 31,\n      \"email\": \"rajesh.kumar@example.com\",\n      \"phone\": \"9876543211\",\n      \"aadhaarNumber\": \"210987654321\",\n      \"passportNumber\": \"P1234567\",\n      \"mealPreference\": \"non-vegetarian\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/api/v1/bookings",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "bookings"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Test Case 6 - Valid: Empty Optional Fields",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201 Created', function() {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Booking saved successfully with empty passport numbers', function() {",
+              "  let jsonData = pm.response.json();",
+              "  pm.expect(jsonData.id).to.exist;",
+              "  pm.expect(jsonData.status).to.equal('CONFIRMED');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{JWT_TOKEN}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"flightId\": 1,\n  \"userId\": 7,\n  \"seatNumbers\": [\"E5A\", \"E5B\"],\n  \"passengerName\": \"Asha Kumar\",\n  \"passengerEmail\": \"asha.kumar@example.com\",\n  \"passengerPhone\": \"9876543210\",\n  \"passengerAge\": 29,\n  \"aadhaarNumber\": \"123456789012\",\n  \"passportNumber\": \"\",\n  \"mealPreference\": \"vegetarian\",\n  \"wheelchairAssistance\": false,\n  \"totalAmount\": 12500,\n  \"paymentMethod\": \"WALLET\",\n  \"additionalPassengers\": [\n    {\n      \"fullName\": \"Rajesh Kumar\",\n      \"age\": 31,\n      \"email\": \"rajesh.kumar@example.com\",\n      \"phone\": \"9876543211\",\n      \"aadhaarNumber\": \"210987654321\",\n      \"passportNumber\": \"\",\n      \"mealPreference\": \"non-vegetarian\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/api/v1/bookings",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "bookings"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "JWT_TOKEN",
+      "value": "your_jwt_token_here",
+      "type": "string"
+    }
+  ]
+}

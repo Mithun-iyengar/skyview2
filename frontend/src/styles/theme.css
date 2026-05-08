@@ -1,0 +1,43 @@
+/* --------------------------------------------------------------------------
+   Skyline Airways - Theme tokens and reusable visual helpers
+   Keep these values centralized for consistent branding across all pages.
+---------------------------------------------------------------------------- */
+
+:root{
+  --brand:#102a6b;          /* primary navy blue */
+  --accent:#d4af37;         /* royal gold accent */
+  --brand-deep:#08162f;
+  --brand-soft:#1f4da0;
+}
+
+.brand{
+  font-family: Georgia, 'Times New Roman', serif;
+  letter-spacing: .02em;
+}
+
+/* Subtle focus and hover motion for the whole app */
+.transition-smooth{
+  transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, color .18s ease, border-color .18s ease;
+}
+
+.hover-lift:hover{transform: translateY(-2px)}
+
+.text-accent{color:var(--accent)}
+.bg-brand-gradient{background: var(--page-gradient)}
+
+/* Decorative airline sky glow used by hero sections */
+.sky-glow{
+  position:relative;
+  overflow:hidden;
+}
+
+.sky-glow::before{
+  content:'';
+  position:absolute;
+  inset:-2px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(212,175,55,0.18), transparent 25%),
+    radial-gradient(circle at 80% 10%, rgba(255,255,255,0.16), transparent 22%),
+    radial-gradient(circle at 50% 90%, rgba(31,77,160,0.18), transparent 28%);
+  pointer-events:none;
+}

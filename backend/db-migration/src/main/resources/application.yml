@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/skyline_airways_auth?createDatabaseIfNotExist=true}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root@39}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  flyway:
+    enabled: false
+
+app:
+  flyway:
+    locations: classpath:db/migration
+
+logging:
+  level:
+    org.flywaydb: INFO
+    com.skylineairways: INFO
+
+server:
+  port: ${SERVER_PORT:0}

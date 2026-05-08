@@ -1,0 +1,87 @@
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.mail.MailSenderValidatorAutoConfiguration
+  application:
+    name: auth-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/skyline_airways_auth?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:root@39}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+    show-sql: false
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:mnmiyengar@gmail.com}
+    password: ${MAIL_PASSWORD:gwnppyijkwzaxrdz}
+    test-connection: false
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: ${MAIL_HOST:smtp.gmail.com}
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+email:
+  sendgrid:
+    api-key: ${SENDGRID_API_KEY:}
+    from: ${SENDGRID_FROM:${MAIL_USERNAME:}}
+  brevo:
+    api-key: ${EMAIL_BREVO_API_KEY:}
+    from: ${EMAIL_BREVO_FROM:${MAIL_USERNAME:}}
+  http:
+    trust-all-ssl: ${EMAIL_HTTP_TRUST_ALL_SSL:true}
+
+jwt:
+  secret: ${JWT_SECRET:skylineairwayssecretkeyforjwttokens}
+  expiration-ms: 7200000
+
+server:
+  port: ${SERVER_PORT:8086}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+    registry-fetch-interval-seconds: 5
+    healthcheck:
+      enabled: true
+  instance:
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+    instance-id: ${spring.application.name}:${server.port}:${random.value}
+    prefer-ip-address: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+  health:
+    mail:
+      enabled: false
+
+logging:
+  level:
+    com.skylineairways: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

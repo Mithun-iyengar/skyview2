@@ -1,0 +1,259 @@
+{
+  "info": {
+    "name": "Skyline Airways Flight API",
+    "description": "Collection for testing Flight Service endpoints",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth Operations",
+      "item": [
+        {
+          "name": "Login User (Save Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let jsonData = {};",
+                  "try { jsonData = pm.response.json(); } catch (e) {}",
+                  "if (jsonData.token) {",
+                  "  pm.collectionVariables.set('token', jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"your-email-or-phone-or-username\",\n  \"password\": \"your-password\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Flight Operations",
+      "item": [
+        {
+          "name": "Create Flight",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/flights",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "flights"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flightNumber\": \"SG101\",\n  \"aircraftType\": \"Boeing 777\",\n  \"baseFare\": 5000,\n  \"taxes\": 500,\n  \"businessMultiplier\": 1.8,\n  \"sourceAirport\": \"DEL\",\n  \"destinationAirport\": \"BOM\",\n  \"midLandingAirport\": null,\n  \"departureTime\": \"2026-05-15T08:00:00Z\",\n  \"arrivalTime\": \"2026-05-15T11:30:00Z\",\n  \"flightImage\": \"\",\n  \"seatClasses\": [\n    {\n      \"classType\": \"BUSINESS\",\n      \"className\": \"Business\",\n      \"rows\": 4,\n      \"columnsPerRow\": 2\n    },\n    {\n      \"classType\": \"ECONOMY\",\n      \"className\": \"Economy\",\n      \"rows\": 10,\n      \"columnsPerRow\": 6\n    }\n  ]\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Flights",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/flights",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "flights"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Flight by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/flights/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "flights", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Flight",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/flights/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "flights", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Occupy Seats",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/flights/1/seats/occupy",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "flights", "1", "seats", "occupy"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"seatNumbers\": [\"B1A\", \"B1B\", \"E1A\"]\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Booking + Wallet Operations",
+      "item": [
+        {
+          "name": "Lock Seats",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seats/lock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "seats",
+                "lock"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"flightId\": 123,\n  \"seatNumbers\": [\"1A\", \"1B\"],\n  \"userId\": 1\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Wallet Deduct",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/deduct",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "deduct"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 100.00\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Wallet Balance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

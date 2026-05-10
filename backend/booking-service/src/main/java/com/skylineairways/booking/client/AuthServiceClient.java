@@ -12,7 +12,7 @@ import java.util.Map;
  * Used to deduct and refund wallet balance during booking payment.
  * Calls internal endpoints that don't require JWT authentication.
  */
-@FeignClient(name = "auth-service")
+@FeignClient(name = "auth-service", url = "${services.auth.url:http://localhost:8086}")
 public interface AuthServiceClient {
 
     /**

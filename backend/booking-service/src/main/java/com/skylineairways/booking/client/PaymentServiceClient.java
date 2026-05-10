@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
 
-@FeignClient(name = "payment-service")
+@FeignClient(name = "payment-service", url = "${services.payment.url:http://localhost:8084}")
 public interface PaymentServiceClient {
 
     @PostMapping("/payments/process")

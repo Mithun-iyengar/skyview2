@@ -25,6 +25,15 @@ function normalizeIdentifier(value) {
   return String(value ?? '').trim().toLowerCase()
 }
 
+function normalizeBookingId(bookingId) {
+  const raw = String(bookingId ?? '').trim()
+  if (!raw) {
+    return null
+  }
+
+  return /^\d+$/.test(raw) ? raw : null
+}
+
 function addIdentifier(seen, type, value) {
   const normalized = normalizeIdentifier(value)
   if (!normalized) {
@@ -144,8 +153,19 @@ export const bookingApi = {
       })
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.message || `Failed to create booking: ${response.status}`)
+        const rawError = await response.text().catch(() => '')
+        let parsedMessage = ''
+
+        if (rawError) {
+          try {
+            const parsed = JSON.parse(rawError)
+            parsedMessage = parsed?.message || parsed?.error || ''
+          } catch {
+            parsedMessage = rawError
+          }
+        }
+
+        throw new Error(parsedMessage || `Failed to create booking: ${response.status}`)
       }
       
       return await response.json()
@@ -194,12 +214,41 @@ export const bookingApi = {
       
       const data = await response.json()
       const normalized = Array.isArray(data) ? data : []
-      return mergeBookings(normalized, localBookings)
+
+      // Prefer backend truth when available. Local fallback is only for backend failures.
+      return normalized
     } catch (error) {
       console.error('Error fetching bookings:', error)
       if (localBookings.length > 0) {
         return localBookings
       }
+      throw error
+    }
+  },
+
+  // Cancel booking
+  async cancelBooking(bookingId) {
+    try {
+      const normalizedBookingId = normalizeBookingId(bookingId)
+      if (!normalizedBookingId) {
+        throw new Error('This booking cannot be cancelled because it is not synced with the server yet. Please refresh and try again.')
+      }
+
+      const response = await fetch(`${API_BASE_URL}/bookings/${normalizedBookingId}/cancel`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${getAuthToken()}`
+        }
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Failed to cancel booking: ${response.status}`)
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error('Error cancelling booking:', error)
       throw error
     }
   }

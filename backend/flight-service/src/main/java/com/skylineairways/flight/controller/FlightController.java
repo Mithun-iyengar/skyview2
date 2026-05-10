@@ -84,4 +84,12 @@ public class FlightController {
         log.info("Request to release HOLD on seats for flight {}: {}", id, seatNumbers);
         return ResponseEntity.ok(flightService.releaseHoldOnSeats(id, seatNumbers));
     }
+
+    @PostMapping("/{id}/seats/release-booked")
+    public ResponseEntity<Flight> releaseBookedSeats(@PathVariable Long id, @RequestBody Map<String, Object> request) {
+        @SuppressWarnings("unchecked")
+        List<String> seatNumbers = (List<String>) request.get("seatNumbers");
+        log.info("Request to release BOOKED seats for flight {}: {}", id, seatNumbers);
+        return ResponseEntity.ok(flightService.releaseBookedSeats(id, seatNumbers));
+    }
 }

@@ -226,6 +226,34 @@ public class FlightService {
     }
 
     /**
+     * Release already BOOKED seats back to AVAILABLE.
+     * Used when a confirmed booking is cancelled.
+     */
+    @Transactional
+    public Flight releaseBookedSeats(Long flightId, List<String> seatNumbers) {
+        log.info("Releasing booked seats for flight {}: {}", flightId, seatNumbers);
+        Flight flight = getFlightById(flightId);
+        Set<String> seatsToRelease = new HashSet<>(seatNumbers);
+
+        if (flight.getSeatClasses() != null) {
+            flight.getSeatClasses().forEach(seatClass -> {
+                if (seatClass.getSeats() != null) {
+                    seatClass.getSeats().forEach(seat -> {
+                        if (seatsToRelease.contains(seat.getSeatNumber())) {
+                            if (Seat.STATUS_BOOKED.equals(seat.getSeatStatus())) {
+                                seat.setSeatStatus(Seat.STATUS_AVAILABLE);
+                                log.debug("Seat {} booked status released, reverted to AVAILABLE", seat.getSeatNumber());
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        return flightRepository.save(flight);
+    }
+
+    /**
      * Mark seats as BOOKED (permanently confirmed after successful payment).
      * Transitions seats from HOLD or AVAILABLE to BOOKED status.
      */

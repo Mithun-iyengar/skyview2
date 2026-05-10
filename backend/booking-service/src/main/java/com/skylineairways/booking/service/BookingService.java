@@ -539,4 +539,116 @@ public class BookingService {
             booking.getStatus()
         );
     }
+
+    /**
+     * Cancel a booking with refund calculation based on departure time.
+     * 
+     * Refund Policy:
+     * - Departure > 1 day: No refund
+     * - Departure > 2 days: 25% refund
+     * - Departure > 4 days: 50% refund
+     * - Departure > 5 days: 75% refund
+     */
+    @Transactional
+    public Booking cancelBooking(Long bookingId) {
+        log.info("Cancelling booking {}", bookingId);
+
+        // Get booking
+        Booking booking = getBookingById(bookingId);
+
+        // Validate booking can be cancelled
+        if (!"CONFIRMED".equals(booking.getStatus())) {
+            throw new InvalidPassengerDetailsException("Only confirmed bookings can be cancelled");
+        }
+
+        // Get flight details to check departure time
+        Map<String, Object> flightDetails = flightServiceClient.getFlight(booking.getFlightId());
+        Instant departureTime = Instant.parse(flightDetails.get("departureTime").toString());
+        Instant now = Instant.now();
+
+        // Calculate hours until departure
+        long hoursUntilDeparture = java.time.Duration.between(now, departureTime).toHours();
+
+        // Calculate refund amount
+        BigDecimal refundAmount = calculateRefundAmount(booking.getTotalAmount(), hoursUntilDeparture);
+        log.info("Booking {} - Hours until departure: {}, Refund amount: {}", bookingId, hoursUntilDeparture, refundAmount);
+
+        // Update booking status
+        booking.setStatus("CANCELLED");
+        Booking cancelledBooking = bookingRepository.save(booking);
+
+        // Release seats (BOOKED → AVAILABLE)
+        try {
+            flightServiceClient.releaseBookedSeats(booking.getFlightId(), 
+                Map.of("seatNumbers", booking.getSeatNumbers()));
+            log.info("Seats released for cancelled booking {}", bookingId);
+        } catch (Exception e) {
+            log.error("Failed to release seats for booking {}", bookingId, e);
+            // Continue with cancellation even if seat release fails
+        }
+
+        // Process refund to wallet
+        if (refundAmount.compareTo(BigDecimal.ZERO) > 0) {
+            try {
+                WalletResponse walletResponse = authServiceClient.addMoneyToWallet(
+                    Map.of(
+                        "userId", booking.getUserId(),
+                        "amount", refundAmount
+                    )
+                );
+                log.info("Refunded {} to wallet for booking {}. New balance: {}", 
+                    refundAmount, bookingId, walletResponse.getBalance());
+            } catch (Exception e) {
+                log.error("Failed to refund wallet for booking {}", bookingId, e);
+                // Continue - booking is cancelled, refund failure is logged
+            }
+        }
+
+        // Send cancellation notification
+        String cancellationDetails = buildCancellationDetails(cancelledBooking, refundAmount, hoursUntilDeparture);
+        try {
+            notificationServiceClient.sendBookingCancellation(booking.getPassengerEmail(), cancellationDetails);
+        } catch (Exception e) {
+            log.error("Failed to send cancellation notification for booking {}", bookingId, e);
+        }
+
+        return cancelledBooking;
+    }
+
+    private BigDecimal calculateRefundAmount(BigDecimal totalAmount, long hoursUntilDeparture) {
+        if (hoursUntilDeparture <= 24) { // <= 1 day
+            return BigDecimal.ZERO;
+        } else if (hoursUntilDeparture <= 48) { // <= 2 days
+            return totalAmount.multiply(new BigDecimal("0.25"));
+        } else if (hoursUntilDeparture <= 96) { // <= 4 days
+            return totalAmount.multiply(new BigDecimal("0.50"));
+        } else if (hoursUntilDeparture <= 120) { // <= 5 days
+            return totalAmount.multiply(new BigDecimal("0.75"));
+        } else { // > 5 days
+            return totalAmount.multiply(new BigDecimal("0.75"));
+        }
+    }
+
+    private String buildCancellationDetails(Booking booking, BigDecimal refundAmount, long hoursUntilDeparture) {
+        return String.format(
+            "Booking Cancellation Confirmation\n\n" +
+            "Booking ID: %d\n" +
+            "Flight ID: %d\n" +
+            "Passenger: %s\n" +
+            "Email: %s\n" +
+            "Seats: %s\n" +
+            "Original Amount: %.2f\n" +
+            "Refund Amount: %.2f\n" +
+            "Hours until departure: %d\n" +
+            "Status: CANCELLED",
+            booking.getId(),
+            booking.getFlightId(),
+            booking.getPassengerName(),
+            booking.getPassengerEmail(),
+            String.join(", ", booking.getSeatNumbers()),
+            booking.getTotalAmount(),
+            refundAmount,
+            hoursUntilDeparture
+        );
+    }
 }

@@ -514,83 +514,6 @@ const AddFlight = () => {
     setMidDropdownOpen(false);
   };
 
-  const loadLuxuryFlightTemplate = () => {
-    const now = new Date();
-    const departure = new Date(now.getTime() + (48 * 60 * 60 * 1000));
-    departure.setHours(19, 15, 0, 0);
-    const arrival = new Date(departure.getTime() + (150 * 60 * 1000));
-
-    const baseFare = '4800';
-    const taxes = '520';
-
-    setFormData({
-      flightId: '2',
-      flightNumber: 'SL202',
-      aircraftType: 'Airbus A320 Neo',
-      totalSeats: '',
-      baseFare,
-      taxes,
-      businessMultiplier: '1.5',
-      sourceAirport: 'DEL',
-      destinationAirport: 'BOM',
-      midLandingAirport: '',
-      departureDate: departure.toISOString().split('T')[0],
-      arrivalDate: arrival.toISOString().split('T')[0],
-      departureTime: '19:15',
-      arrivalTime: '21:45',
-      flightImage: null,
-      imagePreview: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=500&fit=crop',
-    });
-
-    setServices({
-      meals: true,
-      wifi: true,
-      baggage: true,
-      entertainment: true,
-      priorityBoarding: true,
-    });
-
-    setSeatClasses([
-      {
-        classType: 'BUSINESS',
-        className: 'Business',
-        rows: 4,
-        columnsPerRow: 2,
-        pricePerSeat: 0,
-        totalSeats: 8,
-        previewSeats: [],
-        seats: generateSeatLayout('BUSINESS', 4, 2),
-      },
-      {
-        classType: 'ECONOMY',
-        className: 'Economy',
-        rows: 10,
-        columnsPerRow: 6,
-        pricePerSeat: 0,
-        totalSeats: 60,
-        previewSeats: [],
-        seats: generateSeatLayout('ECONOMY', 10, 6),
-      },
-    ]);
-
-    setMapData({
-      sourceLocation: { code: 'DEL', name: 'Indira Gandhi Delhi International', city: 'New Delhi' },
-      destinationLocation: { code: 'BOM', name: 'Bombay Sahar International', city: 'Mumbai' },
-    });
-
-    setErrors({});
-    setSubmitted(false);
-    setSourceSearchTerm('');
-    setDestSearchTerm('');
-    setMidSearchTerm('');
-    setSourceDropdownOpen(false);
-    setDestDropdownOpen(false);
-    setMidDropdownOpen(false);
-    setSyncStatus({ tone: 'info', text: 'Luxury template loaded. Review the form and save it manually.' });
-    setSuccessMessage('Luxury template applied. Adjust any field and submit manually when ready.');
-    setTimeout(() => setSuccessMessage(''), 2600);
-  };
-
   // Calculate pricing for seat classes based on base fare, tax, and business multiplier
   const calculatePrices = () => {
     if (!formData.baseFare || !formData.taxes) return { economy: 0, business: 0 };
@@ -733,34 +656,6 @@ const AddFlight = () => {
           <span>{syncStatus.text}</span>
         </div>
 
-        <div className="admin-card luxury-template-card fade-in">
-          <h3 className="admin-card-title">
-            <i className="bi bi-gem"></i> Luxury Flight Template
-          </h3>
-          <p className="seat-config-description" style={{ marginTop: 0 }}>
-            Load a luxury flight draft, edit every field manually, then save it with the regular Add Flight button.
-          </p>
-          <div className="luxury-template-actions">
-            <button
-              type="button"
-              className="btn btn-seed-luxury"
-              onClick={loadLuxuryFlightTemplate}
-            >
-              <i className="bi bi-magic"></i> Load Luxury Template
-            </button>
-            <button
-              type="button"
-              className="btn btn-reset"
-              onClick={resetManualFlightForm}
-            >
-              <i className="bi bi-arrow-counterclockwise"></i> Clear Draft
-            </button>
-          </div>
-          <div className="luxury-template-notes">
-            <span><i className="bi bi-pencil-square"></i> Flight ID can be set manually.</span>
-            <span><i className="bi bi-eye"></i> No flight is created until you submit the form.</span>
-          </div>
-        </div>
 
         {/* Form Start */}
         <form onSubmit={handleSubmit} className="admin-form fade-in">

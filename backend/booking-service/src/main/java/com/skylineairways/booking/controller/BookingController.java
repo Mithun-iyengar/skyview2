@@ -100,6 +100,13 @@ public class BookingController {
         return ResponseEntity.ok(mapBookingToResponseDto(booking));
     }
 
+    @PostMapping("/{bookingId}/cancel")
+    public ResponseEntity<BookingResponseDto> cancelBooking(@PathVariable Long bookingId) {
+        log.info("Request to cancel booking {}", bookingId);
+        Booking cancelledBooking = bookingService.cancelBooking(bookingId);
+        return ResponseEntity.ok(mapBookingToResponseDto(cancelledBooking));
+    }
+
     private BookingResponseDto mapBookingToResponseDto(Booking booking) {
         BookingResponseDto dto = new BookingResponseDto();
         dto.setId(booking.getId());

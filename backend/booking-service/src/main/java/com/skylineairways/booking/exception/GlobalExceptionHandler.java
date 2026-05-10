@@ -1,6 +1,11 @@
 package com.skylineairways.booking.exception;
 
-import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,8 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
-@Slf4j
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @ExceptionHandler(InvalidPassengerDetailsException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidPassengerDetailsException(InvalidPassengerDetailsException ex, WebRequest request) {
@@ -78,6 +85,44 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleGlobalException(Exception ex, WebRequest request) {
         log.error("Unexpected error: ", ex);
         return buildErrorResponse("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<Map<String, Object>> handleFeignException(FeignException ex, WebRequest request) {
+        int statusCode = ex.status();
+        HttpStatus status = HttpStatus.resolve(statusCode);
+        if (status == null) {
+            status = HttpStatus.BAD_GATEWAY;
+        }
+
+        String message = extractFeignMessage(ex);
+        if (message == null || message.isBlank()) {
+            message = "Downstream service request failed";
+        }
+
+        log.warn("Downstream service error (status {}): {}", status.value(), message);
+        return buildErrorResponse(message, status);
+    }
+
+    private String extractFeignMessage(FeignException ex) {
+        String content = ex.contentUTF8();
+        if (content == null || content.isBlank()) {
+            return ex.getMessage();
+        }
+
+        try {
+            JsonNode root = OBJECT_MAPPER.readTree(content);
+            if (root.hasNonNull("message")) {
+                return root.get("message").asText();
+            }
+            if (root.hasNonNull("error")) {
+                return root.get("error").asText();
+            }
+        } catch (JsonProcessingException ignored) {
+            // Fall through and return raw content for non-JSON payloads.
+        }
+
+        return content;
     }
 
     private ResponseEntity<Map<String, Object>> buildErrorResponse(String message, HttpStatus status) {

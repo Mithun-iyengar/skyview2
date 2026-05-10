@@ -43,6 +43,14 @@ public class NotificationService {
         sendEmail(recipientEmail, subject, message, "PAYMENT_FAILED");
     }
 
+    public void sendBookingCancellation(String recipientEmail, String cancellationDetails) {
+        String subject = "Skyline Airways - Booking Cancellation";
+        String message = "Dear Customer,\n\nYour booking has been cancelled.\n\n" + cancellationDetails +
+                        "\n\nIf you have any questions, please contact customer support.\n\nBest regards,\nSkyline Airways Team";
+
+        sendEmail(recipientEmail, subject, message, "BOOKING_CANCELLATION");
+    }
+
     private void sendEmail(String recipientEmail, String subject, String message, String type) {
         Notification notification = new Notification();
         notification.setRecipientEmail(recipientEmail);

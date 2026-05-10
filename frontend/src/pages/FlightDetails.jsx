@@ -209,11 +209,6 @@ export default function FlightDetails() {
       const numeric = Number(exactMatch[0])
       return Number.isFinite(numeric) ? numeric : null
     }
-    const embeddedMatch = normalized.match(/(\d+)/)
-    if (embeddedMatch) {
-      const numeric = Number(embeddedMatch[0])
-      return Number.isFinite(numeric) ? numeric : null
-    }
     return null
   }
 
@@ -279,7 +274,7 @@ export default function FlightDetails() {
     }
 
     const resolveFlightId = async () => {
-      const candidateValues = [flight?.flightId, flight?.id, flight?.flightNumber, id]
+      const candidateValues = [flight?.flightId, flight?.id, id]
       for (const candidate of candidateValues) {
         const parsedId = parseNumericId(candidate)
         if (Number.isFinite(parsedId)) {

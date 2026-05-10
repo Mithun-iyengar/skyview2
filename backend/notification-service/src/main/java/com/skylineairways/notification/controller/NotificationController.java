@@ -34,4 +34,11 @@ public class NotificationController {
         notificationService.sendPaymentFailed(email, paymentDetails);
         return ResponseEntity.ok("Payment failed notification sent");
     }
+
+    @PostMapping("/booking-cancellation")
+    public ResponseEntity<String> sendBookingCancellation(@RequestParam String email, @RequestParam String cancellationDetails) {
+        log.info("Sending booking cancellation notification to {}", email);
+        notificationService.sendBookingCancellation(email, cancellationDetails);
+        return ResponseEntity.ok("Booking cancellation notification sent");
+    }
 }

@@ -13,10 +13,12 @@ REM Check if MySQL is running
 echo Checking MySQL connection...
 if defined SKIP_MYSQL_CHECK (
     echo SKIP_MYSQL_CHECK is set - skipping MySQL availability check.
-) else (
-    goto :do_mysql_check
+    goto after_mysql_check
 )
-goto :after_mysql_check
+if not defined SKIP_MYSQL_CHECK (
+    goto do_mysql_check
+)
+goto after_mysql_check
 
 :do_mysql_check
 mysql -u root -p"root@39" -e "SELECT 1;" >nul 2>&1

@@ -37,6 +37,7 @@ export default function Reservations() {
   const [error, setError] = useState(null)
   const [successBanner, setSuccessBanner] = useState('')
   const [userId, setUserId] = useState(null)
+  const [cancellingBookingId, setCancellingBookingId] = useState(null)
 
   useEffect(() => {
     const message = sessionStorage.getItem('skyline_booking_success')
@@ -76,6 +77,33 @@ export default function Reservations() {
 
     fetchBookings()
   }, [])
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this booking? Refund will be processed based on departure time.')) {
+      return
+    }
+
+    setCancellingBookingId(bookingId)
+    setError(null)
+
+    try {
+      const cancelledBooking = await bookingApi.cancelBooking(bookingId)
+      
+      // Update the booking in the list
+      setBookings(prevBookings => 
+        prevBookings.map(booking => 
+          booking.id === bookingId ? cancelledBooking : booking
+        )
+      )
+
+      setSuccessBanner('Booking cancelled successfully. Refund has been processed to your wallet.')
+      setTimeout(() => setSuccessBanner(''), 5000)
+    } catch (err) {
+      setError(err.message || 'Failed to cancel booking')
+    } finally {
+      setCancellingBookingId(null)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0f1f] via-[#0f1a35] to-[#1a0f2e] relative overflow-hidden">
@@ -167,6 +195,44 @@ export default function Reservations() {
                       {booking.status || 'Unknown'}
                     </div>
                   </div>
+
+                  {/* Cancel Button for Confirmed Bookings */}
+                  {booking.status === 'CONFIRMED' && (
+                    <div style={{ padding: '0 28px 20px 28px' }}>
+                      <button
+                        onClick={() => handleCancelBooking(booking.id)}
+                        disabled={cancellingBookingId === booking.id}
+                        style={{
+                          width: '100%',
+                          padding: '12px 20px',
+                          background: cancellingBookingId === booking.id ? '#374151' : '#dc2626',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 8,
+                          fontSize: 14,
+                          fontWeight: 600,
+                          cursor: cancellingBookingId === booking.id ? 'not-allowed' : 'pointer',
+                          transition: 'background-color 0.2s',
+                          opacity: cancellingBookingId === booking.id ? 0.7 : 1
+                        }}
+                        onMouseOver={(e) => {
+                          if (cancellingBookingId !== booking.id) {
+                            e.target.style.background = '#b91c1c'
+                          }
+                        }}
+                        onMouseOut={(e) => {
+                          if (cancellingBookingId !== booking.id) {
+                            e.target.style.background = '#dc2626'
+                          }
+                        }}
+                      >
+                        {cancellingBookingId === booking.id ? 'Cancelling...' : 'Cancel Booking'}
+                      </button>
+                      <p style={{ fontSize: 12, color: '#9ca3af', textAlign: 'center', marginTop: 8 }}>
+                        Refund based on departure time: &lt;1 day: No refund, 1-2 days: 25%, 2-4 days: 50%, 4-5 days: 75%, &gt;5 days: 75%
+                      </p>
+                    </div>
+                  )}
 
                   <div style={{ padding: '26px 28px' }}>
                     <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginBottom: 18 }}>
